@@ -6,12 +6,24 @@ const cors = require("cors");
 dotenv.config();
 const app = express();
 
+/* ================== CORS ================== */
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://heroic-daffodil-c9f700.netlify.app",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 /* ================== MIDDLEWARE ================== */
-app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
-/* ================== ROOT HEALTH CHECK ================== */
+/* ================== ROOT ROUTE ================== */
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
@@ -19,9 +31,7 @@ app.get("/", (req, res) => {
 /* ================== DATABASE ================== */
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB Connected Successfully");
-  })
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch((err) => {
     console.error("❌ MongoDB Connection Error:");
     console.error(err.message);
