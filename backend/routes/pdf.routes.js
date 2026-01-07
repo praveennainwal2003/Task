@@ -2,7 +2,6 @@ const router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const Pdf = require("../models/pdf");
 const auth = require("../middleware/authMiddleware");
 const role = require("../middleware/roleMiddleware");
 const redis = require("../utils/redisClient");
