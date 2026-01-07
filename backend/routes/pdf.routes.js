@@ -1,28 +1,13 @@
 const router = require("express").Router();
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const Pdf = require("../models/pdf");
 const auth = require("../middleware/authMiddleware");
 const role = require("../middleware/roleMiddleware");
 const redis = require("../utils/redisClient");
 
-
-const uploadDir = path.join(__dirname, "..", "uploads", "pdfs");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
+/* ===== MULTER (MEMORY STORAGE – RENDER SAFE) ===== */
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
       cb(null, true);
@@ -32,6 +17,7 @@ const upload = multer({
   },
 });
 
+/* ===== ACADEMY UPLOAD ===== */
 router.post(
   "/upload",
   auth,
@@ -39,22 +25,27 @@ router.post(
   upload.single("pdf"),
   async (req, res) => {
     try {
+      if (!req.file) {
+        return res.status(400).json({ msg: "No PDF uploaded" });
+      }
+
       const pdf = await Pdf.create({
         subjectName: req.body.subjectName,
         className: req.body.className,
         schoolName: req.body.schoolName,
-        pdfUrl: `uploads/pdfs/${req.file.filename}`,
+        pdfUrl: req.file.originalname, // placeholder (S3/Cloudinary ready)
         uploadedBy: req.user.id,
       });
 
-      res.json(pdf);
+      res.json({ msg: "PDF uploaded", pdf });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error(err);
+      res.status(500).json({ error: "Upload failed" });
     }
   }
 );
 
-
+/* ===== STUDENT SEARCH ===== */
 router.get("/", auth, async (req, res) => {
   try {
     Object.keys(req.query).forEach(

@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 dotenv.config();
+
 const app = express();
 
 /* ================== CORS ================== */
@@ -14,16 +15,13 @@ app.use(
       "https://heroic-daffodil-c9f700.netlify.app",
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 /* ================== MIDDLEWARE ================== */
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
 
-/* ================== ROOT ROUTE ================== */
+/* ================== ROOT ================== */
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
@@ -32,10 +30,7 @@ app.get("/", (req, res) => {
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully"))
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:");
-    console.error(err.message);
-  });
+  .catch((err) => console.error("❌ MongoDB Error:", err.message));
 
 /* ================== ROUTES ================== */
 app.use("/api/auth", require("./routes/auth.routes"));
