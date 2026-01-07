@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import API from "../services/api";
 import PDFCard from "../components/PDFCard";
 import "../styles/pdf.css";
@@ -31,10 +31,6 @@ const SearchPDF = () => {
     }
   };
 
-  useEffect(() => {
-    search();
-  }, []);
-
   return (
     <div className="search-page">
       <h2>Search Study PDFs</h2>
@@ -42,6 +38,7 @@ const SearchPDF = () => {
       <div className="search-bar">
         <input
           placeholder="Subject (e.g maths)"
+          value={filters.subjectName}
           onChange={(e) =>
             setFilters({ ...filters, subjectName: e.target.value })
           }
@@ -49,6 +46,7 @@ const SearchPDF = () => {
 
         <input
           placeholder="Class (e.g ten)"
+          value={filters.className}
           onChange={(e) =>
             setFilters({ ...filters, className: e.target.value })
           }
@@ -56,6 +54,7 @@ const SearchPDF = () => {
 
         <input
           placeholder="School (e.g gk)"
+          value={filters.schoolName}
           onChange={(e) =>
             setFilters({ ...filters, schoolName: e.target.value })
           }
